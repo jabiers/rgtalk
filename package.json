@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.14.2",
+    "express": "^4.13.3",
     "jquery-file-upload-middleware": "^0.1.7",
     "socket.io": "^1.4.4",
     "universal-analytics": "^0.3.10"
