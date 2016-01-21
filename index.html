@@ -47,9 +47,9 @@
         </div>
         <div class="nav navbar-nav navbar-right">
             <div class="info-div">
-                <p class="text-right">Total <span id="total-info" class="badge text-right">5</span></p>
-                <p class="text-right">Users <span id="users-info" class="badge text-right">10</span></p>
-                <p class="text-right">Rooms <span id="rooms-info" class="badge text-right">2</span>
+                <p class="text-right">Total <span id="total-info" class="badge text-right">0</span></p>
+                <p class="text-right">Users <span id="users-info" class="badge text-right">0</span></p>
+                <p class="text-right">Rooms <span id="rooms-info" class="badge text-right">0</span>
                 </div>
             </div>
         </nav>
@@ -64,7 +64,7 @@
         <div class="panel-footer">
             <div class="input-group">
                 <span class="input-group-btn btn-file">
-                    <button type="file" class="btn btn-primary btn-sm" onclick="alert('click');$('#upLoadFile').click();">+</button>
+                    <button type="file" class="btn btn-primary btn-sm" onclick="$('#upLoadFile').click();">+</button>
                     <div class="hide">
                         <input id="upLoadFile" type="file" class="btn btn-primary btn-sm" name="files[]" data-url="/upload" multiple></button>
 
@@ -143,7 +143,6 @@
 
         $(function(){
             $("button#leaveButton").click(function(){
-                console.log(roomNum);
                 $("#messages").append($('<tr class="danger">').append($('<td class="col-md-1 col-sm-1">').text('알림')).append($('<td class="col-md-8 col-sm-8">').text('퇴장하였습니다.')));
                 socket.emit('leave', roomNum);
                 $("#myModal").modal();
@@ -158,7 +157,6 @@
         }
 
         socket.on('chat message', function(msg){
-            console.log(msg.msg);
             $("#messages").append($('<tr>').append($('<td class="col-md-1 col-sm-1">').text(msg.name)).append($('<td class="col-md-8 col-sm-8">').text(msg.msg)));
             $(window).scrollTop($(document).height());
         });
@@ -181,13 +179,11 @@
         });
 
         socket.on('destory room', function(room) {
-            console.log("destory");
             $("#messages").append($('<tr class="warning">').append($('<td class="col-md-1 col-sm-1">').text('알림')).append($('<td class="col-md-8 col-sm-8">').text('상대방이 나갔습니다.')));
             socket.emit('waiting', socket.name);
         });
 
         socket.on('test', function(obj){
-            console.log(obj);
         });
 
         </script>
