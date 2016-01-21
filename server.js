@@ -170,6 +170,6 @@ function stringStartsWith (string, prefix) {
     return string.slice(0, prefix.length) == prefix;
 }
 
-http.listen(3000, function() {
-	console.log('listening on *:3000');
+http.listen(80, function() {
+	console.log('listening on *:');
 });
