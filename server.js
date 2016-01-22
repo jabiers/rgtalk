@@ -64,6 +64,7 @@ app.delete('/upload', function( req, res ){
 
 app.post('/upload', function(req, res, next){
 
+console.log('/upload');
 	var blobSvc = azure.createBlobService();
 	//create write stream for blob
 
@@ -87,6 +88,7 @@ app.post('/upload', function(req, res, next){
                 file.pipe(stream);
             });
             busboy.on('finish', function () {
+				console.log('finish');
                 res.writeHead(200, { 'Connection': 'close' });
                 res.end("That's all folks!");
             });
