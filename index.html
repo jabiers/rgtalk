@@ -13,7 +13,6 @@
     <script src="js/jquery.iframe-transport.js"></script>
     <!-- The basic File Upload plugin -->
     <script src="js/jquery.fileupload.js"></script>
-    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 
     <style>
     body { max-width: 100%; padding-top: 90px; padding-bottom: 70px; }
@@ -92,8 +91,8 @@
             $('#myModal').on('shown.bs.modal', function () {
 
                 if($(".adsense").length <= 0) {
-                    $(".modal-body").append("<div class='adsense'><ins class='adsbygoogle' style='display:block' data-ad-client='ca-pub-1722366924586940' data-ad-slot='6990906116' data-ad-format='auto'></ins></div>");
-                    (adsbygoogle = window.adsbygoogle || []).push({});
+                    $(".modal-body").append("<script async src='//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js'></script><div class='adsense'><ins class='adsbygoogle' style='display:block' data-ad-client='ca-pub-1722366924586940' data-ad-slot='6990906116' data-ad-format='auto'></ins></div><script>(adsbygoogle = window.adsbygoogle || []).push({});</script>");
+
                 }
 
                 $('#name').focus();
