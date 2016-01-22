@@ -10,52 +10,111 @@ var upload = require('jquery-file-upload-middleware');
 var crypto = require('crypto');
 var path = require('path');
 var azure = require('azure-storage');
+var uuid = require('node-uuid');
+var entityGen = azure.TableUtilities.entityGenerator;
+var nconf = require('nconf');
+var multiparty = require('multiparty');
+var Busboy = require('busboy');
+
+// nconf.env().file({ file: 'config.json', search: true });
+// var tableName = nconf.get("TABLE_NAME");
+// var partitionKey = nconf.get("PARTITION_KEY");
+// var accountName = nconf.get("STORAGE_NAME");
+// var accountKey = nconf.get("STORAGE_KEY");
+// var accessKey = nconf.get("ACCESS_KEY");
+// var connectingString = nconf.get("CONNECTING_STRING");
+
 
 var waiting = [];
 var connectionCount = 0;
 var message = {};
-
-upload.configure({
-	uploadDir: __dirname + '/public/uploads',
-	uploadUrl: '/uploads',
-	imageVersions: {
-		thumbnail: {
-			width: 80,
-			height: 80
-		}
-	}
-});
-
-upload.on("begin", function(fileInfo) {
-  fileInfo.name = crypto.createHash('md5').update(fileInfo.originalName).digest('hex') + path.extname(fileInfo.originalName);
-});
+//
+// upload.configure({
+// 	uploadDir: __dirname + '/public/uploads',
+// 	uploadUrl: '/uploads',
+// 	imageVersions: {
+// 		thumbnail: {
+// 			width: 80,
+// 			height: 80
+// 		}
+// 	}
+// });
+//
+// upload.on("begin", function(fileInfo) {
+// 	fileInfo.name = crypto.createHash('md5').update(fileInfo.originalName).digest('hex') + path.extname(fileInfo.originalName);
+// });
 
 app.use(ua.middleware("UA-72646153-1", {cookieName: '_ga'}));
 app.use(express.static('public'));
-app.use(bodyParser.json());
+// app.use(bodyParser.json());
 
 /// Redirect all to home except post
 app.get('/upload', function( req, res ){
-    res.redirect('/');
+	res.redirect('/');
 });
 
 app.put('/upload', function( req, res ){
-    res.redirect('/');
+	res.redirect('/');
 });
 
 app.delete('/upload', function( req, res ){
-    res.redirect('/');
+	res.redirect('/');
 });
 
-app.use('/upload', function(req, res, next){
-    upload.fileHandler({
-        uploadDir: function () {
-            return __dirname + '/public/uploads/'
-        },
-        uploadUrl: function () {
-            return '/uploads'
+
+app.post('/upload', function(req, res, next){
+
+	var blobSvc = azure.createBlobService();
+	//create write stream for blob
+
+
+    blobSvc.createContainerIfNotExists('images', function (error, result, response) {
+
+        if (!error) {
+            // Container exists and allows
+            // anonymous read access to blob
+            // content and metadata within this container
+
+            var busboy = new Busboy({ headers: req.headers });
+            busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
+				console.log(result);
+				console.log(error);
+                var stream = blobSvc.createWriteStreamToBlockBlob(
+                    'images',
+                    filename);
+
+                //pipe req to Azure BLOB write stream
+                file.pipe(stream);
+            });
+            busboy.on('finish', function () {
+                res.writeHead(200, { 'Connection': 'close' });
+                res.end("That's all folks!");
+            });
+
+            req.pipe(busboy);
+
+            req.on('error', function (error) {
+                //KO - handle piping errors
+                console.log('error: ' + error);
+            });
+            req.once('end', function () {
+                //OK
+                console.log('all ok');
+            });
         }
-    })(req, res, next);
+		console.log(result);
+		console.log(error);
+
+    });
+		//
+	// upload.fileHandler({
+	// 	uploadDir: function () {
+	// 		return __dirname + '/public/uploads/'
+	// 	},
+	// 	uploadUrl: function () {
+	// 		return '/uploads'
+	// 	}
+	// })(req, res, next);
 });
 
 app.get('/', function (req,res) {
@@ -168,7 +227,7 @@ setInterval(function(){
 }, 10000);
 
 function stringStartsWith (string, prefix) {
-    return string.slice(0, prefix.length) == prefix;
+	return string.slice(0, prefix.length) == prefix;
 }
 
 http.listen(process.env.PORT || 8080, function() {

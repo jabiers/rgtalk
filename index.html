@@ -115,6 +115,10 @@
                 dataType: 'json',
                 done: function (e, data) {
                     $.each(data.result.files, function (index, file) {
+                        console.log(e);
+                        console.log(data);
+                        console.log(index);
+                        console.log(file);
                         socket.emit('send image', {"imgUrl":file.name,"name":socket.name, "room" : roomNum});
                     });
                 },

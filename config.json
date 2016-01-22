@@ -1,0 +1,8 @@
+{
+    "STORAGE_NAME": "rgtalk",
+    "STORAGE_KEY": "HGSAKIDkGk3DIhPUeGEkHMTuRK9FKJBEvHBmQjCd/EWwPseKUOT4T1wHtUjyt08fGzkqPZfmeAyX7YAmra6dyg==",
+    "PARTITION_KEY": "",
+    "ACCESS_KEY": "HGSAKIDkGk3DIhPUeGEkHMTuRK9FKJBEvHBmQjCd/EWwPseKUOT4T1wHtUjyt08fGzkqPZfmeAyX7YAmra6dyg==",
+    "CONNECTING_STRING" : "DefaultEndpointsProtocol=https;AccountName=rgtalk;AccountKey=HGSAKIDkGk3DIhPUeGEkHMTuRK9FKJBEvHBmQjCd/EWwPseKUOT4T1wHtUjyt08fGzkqPZfmeAyX7YAmra6dyg==;BlobEndpoint=https://rgtalk.blob.core.windows.net/;TableEndpoint=https://rgtalk.table.core.windows.net/;QueueEndpoint=https://rgtalk.queue.core.windows.net/;FileEndpoint=https://rgtalk.file.core.windows.net/",
+    "TABLE_NAME": "tasks"
+}
