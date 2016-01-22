@@ -13,7 +13,7 @@
     <script src="js/jquery.iframe-transport.js"></script>
     <!-- The basic File Upload plugin -->
     <script src="js/jquery.fileupload.js"></script>
-
+    <script type="text/javascript" src="//pagead2.googlesyndication.com/pagead/show_ads.js"></script>
     <style>
     body { max-width: 100%; padding-top: 90px; padding-bottom: 70px; }
     .container-fluid {padding-left: 0px; padding-right: 0px; }
@@ -29,7 +29,6 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-body">
-
                 </div>
                 <div class="modal-footer">
                     <input id="name" type="text" placeholder="Nickname"
@@ -91,8 +90,8 @@
             $('#myModal').on('shown.bs.modal', function () {
 
                 if($(".adsense").length <= 0) {
-                    $(".modal-body").append("<script async src='//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js'></script><div class='adsense'><ins class='adsbygoogle' style='display:block' data-ad-client='ca-pub-1722366924586940' data-ad-slot='6990906116' data-ad-format='auto'></ins></div><script>(adsbygoogle = window.adsbygoogle || []).push({});</script>");
-
+                    $(".modal-body").append("<div class='adsense'><ins class='adsbygoogle' style='display:block' data-ad-client='ca-pub-1722366924586940' data-ad-slot='6990906116' data-ad-format='auto'></ins></div>");
+                    (adsbygoogle = window.adsbygoogle || []).push({});
                 }
 
                 $('#name').focus();
