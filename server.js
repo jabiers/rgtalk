@@ -9,6 +9,7 @@ var visitor = ua('UA-72646153-1');
 var upload = require('jquery-file-upload-middleware');
 var crypto = require('crypto');
 var path = require('path');
+var azure = require('azure-storage');
 
 var waiting = [];
 var connectionCount = 0;
