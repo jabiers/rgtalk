@@ -64,174 +64,176 @@ app.delete('/upload', function( req, res ){
 
 app.post('/upload', function(req, res, next){
 
-console.log('/upload');
-	var blobSvc = azure.createBlobService();
+	console.log('/upload');
+	var blobSvc = azure.createBlobService("rgtalk", "HGSAKIDkGk3DIhPUeGEkHMTuRK9FKJBEvHBmQjCd/EWwPseKUOT4T1wHtUjyt08fGzkqPZfmeAyX7YAmra6dyg==");
 	//create write stream for blob
 
 
-    blobSvc.createContainerIfNotExists('images', function (error, result, response) {
+	blobSvc.createContainerIfNotExists('images', function (error, result, response) {
 
-        if (!error) {
-            // Container exists and allows
-            // anonymous read access to blob
-            // content and metadata within this container
+		if (!error) {
+			// Container exists and allows
+			// anonymous read access to blob
+			// content and metadata within this container
 
-            var busboy = new Busboy({ headers: req.headers });
-            busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
+			var busboy = new Busboy({ headers: req.headers });
+			busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
 				console.log(result);
 				console.log(error);
-                var stream = blobSvc.createWriteStreamToBlockBlob(
-                    'images',
-                    filename);
+				var stream = blobSvc.createWriteStreamToBlockBlob(
+					'images',
+					filename);
 
-                //pipe req to Azure BLOB write stream
-                file.pipe(stream);
-            });
-            busboy.on('finish', function () {
-				console.log('finish');
-                res.writeHead(200, { 'Connection': 'close' });
-                res.end("That's all folks!");
-            });
+					//pipe req to Azure BLOB write stream
+					file.pipe(stream);
+					console.log('finish');
 
-            req.pipe(busboy);
+				});
+				busboy.on('finish', function () {
+					console.log('finish');
+					res.writeHead(200, { 'Connection': 'close' });
+					res.end("That's all folks!");
+				});
 
-            req.on('error', function (error) {
-                //KO - handle piping errors
-                console.log('error: ' + error);
-            });
-            req.once('end', function () {
-                //OK
-                console.log('all ok');
-            });
-        }
-		console.log(result);
-		console.log(error);
+				req.pipe(busboy);
 
-    });
+				req.on('error', function (error) {
+					//KO - handle piping errors
+					console.log('error: ' + error);
+				});
+				req.once('end', function () {
+					//OK
+					console.log('all ok');
+				});
+			}
+			console.log(result);
+			console.log(error);
+
+		});
 		//
-	// upload.fileHandler({
-	// 	uploadDir: function () {
-	// 		return __dirname + '/public/uploads/'
-	// 	},
-	// 	uploadUrl: function () {
-	// 		return '/uploads'
-	// 	}
-	// })(req, res, next);
-});
-
-app.get('/', function (req,res) {
-	visitor.pageview("/").send();
-	res.sendFile(__dirname + '/index.html');
-});
-
-io.on('connection', function(socket){
-	connectionCount++;
-	socket.on('chat message', function(msg) {
-		io.to(msg.room).emit('chat message', { "name":msg.name, "msg":msg.msg } );
+		// upload.fileHandler({
+		// 	uploadDir: function () {
+		// 		return __dirname + '/public/uploads/'
+		// 	},
+		// 	uploadUrl: function () {
+		// 		return '/uploads'
+		// 	}
+		// })(req, res, next);
 	});
 
-	socket.on('send image', function(msg) {
-		io.to(msg.room).emit('send image', { "imgUrl":msg.imgUrl,"name":msg.name } );
+	app.get('/', function (req,res) {
+		visitor.pageview("/").send();
+		res.sendFile(__dirname + '/index.html');
 	});
 
-	socket.on('disconnect', function() {
-		connectionCount--;
-		var index = waiting.indexOf(socket);
-		if (index > -1) {
-			waiting.splice(index, 1);
-		}
+	io.on('connection', function(socket){
+		connectionCount++;
+		socket.on('chat message', function(msg) {
+			io.to(msg.room).emit('chat message', { "name":msg.name, "msg":msg.msg } );
+		});
 
-		message['disconnect room'] = socket.room;
-		if (socket.room) {
-			io.to(socket.room).emit('destory room', socket.room);
-		}
-	});
+		socket.on('send image', function(msg) {
+			io.to(msg.room).emit('send image', { "imgUrl":msg.imgUrl,"name":msg.name } );
+		});
 
-	socket.on('waiting', function(name) {
-		socket.name = name;
-		if (socket.room) {
+		socket.on('disconnect', function() {
+			connectionCount--;
+			var index = waiting.indexOf(socket);
+			if (index > -1) {
+				waiting.splice(index, 1);
+			}
+
+			message['disconnect room'] = socket.room;
+			if (socket.room) {
+				io.to(socket.room).emit('destory room', socket.room);
+			}
+		});
+
+		socket.on('waiting', function(name) {
+			socket.name = name;
+			if (socket.room) {
+				socket.leave(socket.room);
+			}
+
+			var index = waiting.indexOf(socket);
+			if (index < 0) {
+				waiting.push(socket);
+			}
+		});
+
+		socket.on('join', function(obj) {
+			if(socket.room)
 			socket.leave(socket.room);
-		}
 
-		var index = waiting.indexOf(socket);
-		if (index < 0) {
-			waiting.push(socket);
-		}
+			socket.name = obj.name;
+			socket.room = obj.room;
+			socket.join(obj.room);
+			var index = waiting.indexOf(socket);
+			if (index > -1) {
+				waiting.splice(index, 1);
+			}
+		});
+
+		socket.on('leave', function(room) {
+
+			if (socket.room) {
+				socket.leave(socket.room);
+				io.to(socket.room).emit('destory room', socket.room);
+			}
+		});
+
+		socket.on('destory room', function(room) {
+			if (socket.room) {
+				socket.leave(socket.room);
+			}
+
+			var index = waiting.indexOf(socket);
+			if (index < 0) {
+				waiting.push(socket);
+			}
+		});
+
+		socket.on('get info', function() {
+			socket.emit('info', {"waitingUser":waiting.length, "users":connectionCount, "total":100, "rooms":socket.adapter.rooms.length});
+
+		});
 	});
 
-	socket.on('join', function(obj) {
-		if(socket.room)
-		socket.leave(socket.room);
-
-		socket.name = obj.name;
-		socket.room = obj.room;
-		socket.join(obj.room);
-		var index = waiting.indexOf(socket);
-		if (index > -1) {
-			waiting.splice(index, 1);
-		}
-	});
-
-	socket.on('leave', function(room) {
-
-		if (socket.room) {
-			socket.leave(socket.room);
-			io.to(socket.room).emit('destory room', socket.room);
-		}
-	});
-
-	socket.on('destory room', function(room) {
-		if (socket.room) {
-			socket.leave(socket.room);
+	//방 생성
+	setInterval(function(){
+		for(var i = 1; i < waiting.length; i = i + 2) {
+			if (i > waiting.length) {
+			} else {
+				emitJoin(waiting[i - 1], waiting[i]);
+			}
 		}
 
-		var index = waiting.indexOf(socket);
-		if (index < 0) {
-			waiting.push(socket);
+		function emitJoin(soc1, soc2) {
+			soc1.emit('join', {"room":"random:" + soc1.id + soc2.id, "name":soc2.name});
+			soc2.emit('join', {"room":"random:" + soc1.id + soc2.id, "name":soc1.name});
 		}
-	});
+		message['waiting'] = waiting.length;
+		message['rooms'] = io.sockets.adapter.rooms;
+		io.sockets.emit("test", message);
+	}, 1000);
 
-	socket.on('get info', function() {
-		socket.emit('info', {"waitingUser":waiting.length, "users":connectionCount, "total":100, "rooms":socket.adapter.rooms.length});
-
-	});
-});
-
-//방 생성
-setInterval(function(){
-	for(var i = 1; i < waiting.length; i = i + 2) {
-		if (i > waiting.length) {
-		} else {
-			emitJoin(waiting[i - 1], waiting[i]);
+	//정보 갱신
+	setInterval(function(){
+		var rooms = io.sockets.adapter.rooms;
+		var roomCount = 0;
+		for (var roomName in rooms) {
+			if (stringStartsWith(roomName, "random")) {
+				roomCount++;
+			}
 		}
+		io.sockets.emit("info", {"waitingUser":waiting.length, "users":connectionCount, "total":100, "rooms":roomCount});
+
+	}, 10000);
+
+	function stringStartsWith (string, prefix) {
+		return string.slice(0, prefix.length) == prefix;
 	}
 
-	function emitJoin(soc1, soc2) {
-		soc1.emit('join', {"room":"random:" + soc1.id + soc2.id, "name":soc2.name});
-		soc2.emit('join', {"room":"random:" + soc1.id + soc2.id, "name":soc1.name});
-	}
-	message['waiting'] = waiting.length;
-	message['rooms'] = io.sockets.adapter.rooms;
-	io.sockets.emit("test", message);
-}, 1000);
-
-//정보 갱신
-setInterval(function(){
-	var rooms = io.sockets.adapter.rooms;
-	var roomCount = 0;
-	for (var roomName in rooms) {
-		if (stringStartsWith(roomName, "random")) {
-			roomCount++;
-		}
-	}
-	io.sockets.emit("info", {"waitingUser":waiting.length, "users":connectionCount, "total":100, "rooms":roomCount});
-
-}, 10000);
-
-function stringStartsWith (string, prefix) {
-	return string.slice(0, prefix.length) == prefix;
-}
-
-http.listen(process.env.PORT || 8080, function() {
-	console.log('listening on *:');
-});
+	http.listen(process.env.PORT || 8080, function() {
+		console.log('listening on *:');
+	});

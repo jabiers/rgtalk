@@ -1,5 +1,5 @@
 {
-  "name": "rgchat",
+  "name": "rgtalk",
   "version": "1.0.0",
   "description": "rgchat",
   "main": "server.js",
@@ -12,6 +12,7 @@
   "dependencies": {
     "azure-storage": "^0.7.0",
     "body-parser": "^1.14.2",
+    "busboy": "^0.2.12",
     "express": "^4.13.3",
     "jquery-file-upload-middleware": "^0.1.7",
     "multiparty": "^4.1.2",

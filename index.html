@@ -123,8 +123,9 @@
                     });
                 },
                 progressall: function (e, data) {
-                    console.log("progressall");
                     var progress = parseInt(data.loaded / data.total * 100, 10);
+                    console.log("progressall : " + progress);
+
                     $('#progress .progress-bar').css(
                         'width',
                         progress + '%'
