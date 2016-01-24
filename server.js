@@ -65,11 +65,21 @@ app.delete('/upload', function( req, res ){
 app.post('/upload', function(req, res, next){
 
 	console.log('/upload');
-	console.log(req);
-	var blobSvc = azure.createBlobService("rgtalk", "HGSAKIDkGk3DIhPUeGEkHMTuRK9FKJBEvHBmQjCd/EWwPseKUOT4T1wHtUjyt08fGzkqPZfmeAyX7YAmra6dyg==");
+	var blobSvc = azure.createBlobService();
 	//create write stream for blob
 
-	blobSvc.createContainerIfNotExists('images', function (error, result, response) {
+	var date = new Date();
+	var year = date.getFullYear();
+
+	var month = date.getMonth() + 1;
+	month = (month < 10 ? "0" : "") + month;
+
+	var day  = date.getDate();
+	day = (day < 10 ? "0" : "") + day;
+
+	var containername = year + '-' + month + '-' + day;
+	console.log(containername);
+	blobSvc.createContainerIfNotExists(containername, {publicAccessLevel : 'blob'}, function (error, result, response) {
 
 		if (!error) {
 			// Container exists and allows
@@ -79,13 +89,12 @@ app.post('/upload', function(req, res, next){
 			var busboy = new Busboy({ headers: req.headers });
 			var newname;
 			busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
-				console.log(error);
+
 				filename = crypto.createHash('md5').update(filename).digest('hex') + path.extname(filename);
-				newname = filename;
+				newname = containername + '/' + filename;
 				var stream = blobSvc.createWriteStreamToBlockBlob(
-					'images',
+					containername,
 					filename);
-					console.log("created");
 					//pipe req to Azure BLOB write stream
 					file.pipe(stream);
 				});

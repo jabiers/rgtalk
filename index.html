@@ -120,7 +120,6 @@
                 },
                 progressall: function (e, data) {
                     var progress = parseInt(data.loaded / data.total * 100, 10);
-                    console.log("progressall : " + progress);
 
                     $('#progress .progress-bar').css(
                         'width',
@@ -173,7 +172,7 @@
         });
 
         socket.on('send image', function(msg){
-            $("#messages").append($('<tr>').append($('<td class="col-md-1 col-sm-1">').text(msg.name)).append($('<td class="col-md-8 col-sm-8">').append($('<img class="img-responsive" src="https://rgtalk.blob.core.windows.net/images/' + msg.imgUrl + '">'))));
+            $("#messages").append($('<tr>').append($('<td class="col-md-1 col-sm-1">').text(msg.name)).append($('<td class="col-md-8 col-sm-8">').append($('<img class="img-responsive" src="https://rgtalk.blob.core.windows.net/' + msg.imgUrl + '">'))));
             $(window).scrollTop($(document).height());
         });
 
