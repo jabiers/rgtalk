@@ -1,211 +1,211 @@
 <!doctype html>
 <html>
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="google-site-verification" content="3inekgCsFNS8XQ0uVs702WNpIDTkX_uj_COT8rbjve0" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+    <script src='/socket.io/socket.io.js' ></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <script src="js/vendor/jquery.ui.widget.js"></script>
+    <!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
+    <script src="js/jquery.iframe-transport.js"></script>
+    <!-- The basic File Upload plugin -->
+    <script src="js/jquery.fileupload.js"></script>
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
-  <script src='/socket.io/socket.io.js' ></script>
-  <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
-  <script src="js/vendor/jquery.ui.widget.js"></script>
-  <!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
-  <script src="js/jquery.iframe-transport.js"></script>
-  <!-- The basic File Upload plugin -->
-  <script src="js/jquery.fileupload.js"></script>
-  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-
-  <style>
-  body { max-width: 100%; padding-top: 90px; padding-bottom: 70px; }
-  .container-fluid {padding-left: 0px; padding-right: 0px; }
-  .panel-footer {position: fixed; bottom:0; }
-  .info-div {padding-right: 50px; }
-  .adsence {height: 100px; background-color: blue; }
-  </style>
-  <title>Random chat</title>
+    <style>
+    body { max-width: 100%; padding-top: 90px; padding-bottom: 70px; }
+    .container-fluid {padding-left: 0px; padding-right: 0px; }
+    .panel-footer {position: fixed; bottom:0; }
+    .info-div {padding-right: 50px; }
+    .adsence {height: 100px; background-color: blue; }
+    </style>
+    <title>Random chat</title>
 </head>
 <body>
-  <!-- Modal -->
-  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="waitingModal">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-body">
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="waitingModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <input id="name" type="text" placeholder="Nickname"
+                    onkeydown = "if (event.keyCode == 13)
+                    $('button#startButton').click()"  >
+                    <button id="startButton" type="button" class="btn btn-primary">입장하기</button>
+                </div>
+            </div>
         </div>
-        <div class="modal-footer">
-          <input id="name" type="text" placeholder="Nickname"
-          onkeydown = "if (event.keyCode == 13)
-          $('button#startButton').click()"  >
-          <button id="startButton" type="button" class="btn btn-primary">입장하기</button>
+    </div>
+
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="navbar-header">
+            <h1><a class="navbar-brand" href="#">Random Chat</a></h1>
         </div>
-      </div>
-    </div>
-  </div>
+        <div class="nav navbar-nav navbar-right">
+            <div class="info-div">
+                <p class="text-right">Total <span id="total-info" class="badge text-right">0</span></p>
+                <p class="text-right">Users <span id="users-info" class="badge text-right">0</span></p>
+                <p class="text-right">Rooms <span id="rooms-info" class="badge text-right">0</span>
+                </div>
+            </div>
+        </nav>
 
-  <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-    <div class="navbar-header">
-      <h1><a class="navbar-brand" href="#">Random Chat</a></h1>
-    </div>
-    <div class="nav navbar-nav navbar-right">
-      <div class="info-div">
-        <p class="text-right">Total <span id="total-info" class="badge text-right">0</span></p>
-        <p class="text-right">Users <span id="users-info" class="badge text-right">0</span></p>
-        <p class="text-right">Rooms <span id="rooms-info" class="badge text-right">0</span>
+        <table class="table">
+            <thead>
+            </thead>
+            <tbody id="messages">
+            </tbody>
+        </table>
+        <div align="center">
+            <!-- rgtalk-waiting-320-100 -->
+            <ins class="adsbygoogle"
+            style="display:inline-block;width:320px;height:100px"
+            data-ad-client="ca-pub-1722366924586940"
+            data-ad-slot="9781092115"></ins>
+            <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
         </div>
-      </div>
-    </nav>
+        <div class="panel-footer">
+            <div class="input-group">
+                <span class="input-group-btn btn-file">
+                    <button type="file" class="btn btn-primary btn-sm" onclick="$('#upLoadFile').click();">+</button>
+                    <div class="hide">
+                        <input id="upLoadFile" type="file" class="btn btn-primary btn-sm" name="files[]" data-url="/upload" multiple></button>
 
-    <table class="table">
-      <thead>
-      </thead>
-      <tbody id="messages">
-      </tbody>
-    </table>
-    <div align="center">
-      <!-- rgtalk-waiting-320-100 -->
-      <ins class="adsbygoogle"
-      style="display:inline-block;width:320px;height:100px"
-      data-ad-client="ca-pub-1722366924586940"
-      data-ad-slot="9781092115"></ins>
-      <script>
-      (adsbygoogle = window.adsbygoogle || []).push({});
-      </script>
-    </div>
-    <div class="panel-footer">
-      <div class="input-group">
-        <span class="input-group-btn btn-file">
-          <button type="file" class="btn btn-primary btn-sm" onclick="$('#upLoadFile').click();">+</button>
-          <div class="hide">
-            <input id="upLoadFile" type="file" class="btn btn-primary btn-sm" name="files[]" data-url="/upload" multiple></button>
+                    </div>
+                </span>
+                <input id="message" type="text" class="form-control input-sm chat_input" placeholder="Message"
+                onkeydown = "if (event.keyCode == 13)
+                $('button#sendButton').click()"  />
+                <span class="input-group-btn">
+                    <button id="sendButton" class="btn btn-primary btn-sm">Send</button>
+                    <button id="leaveButton" class="btn btn-danger btn-sm">Leave</button>
+                </span>
+            </div>
+        </div>
 
-          </div>
-        </span>
-        <input id="message" type="text" class="form-control input-sm chat_input" placeholder="Message"
-        onkeydown = "if (event.keyCode == 13)
-        $('button#sendButton').click()"  />
-        <span class="input-group-btn">
-          <button id="sendButton" class="btn btn-primary btn-sm">Send</button>
-          <button id="leaveButton" class="btn btn-danger btn-sm">Leave</button>
-        </span>
-      </div>
-    </div>
+        <script>
+        var self = this;
+        var socket = io();
+        var roomNum;
 
-    <script>
-    var self = this;
-    var socket = io();
-    var roomNum;
+        socket.emit('get info');
 
-    socket.emit('get info');
+        window.onbeforeunload = function() {
+            if (roomNum) {
+                return '나가시겠습니까?';
+            }
+        };
 
-    window.onbeforeunload = function() {
-      if (roomNum) {
-        return '나가시겠습니까?';
-      }
-    };
+        $(document).ready(function(){
+            $('#myModal').on('shown.bs.modal', function () {
 
-    $(document).ready(function(){
-      $('#myModal').on('shown.bs.modal', function () {
+                if($(".adsense").length <= 0) {
+                    $(".modal-body").append("<div class='adsense'><ins class='adsbygoogle' style='display:block' data-ad-client='ca-pub-1722366924586940' data-ad-slot='6990906116' data-ad-format='auto'></ins></div>");
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                }
 
-        if($(".adsense").length <= 0) {
-          $(".modal-body").append("<div class='adsense'><ins class='adsbygoogle' style='display:block' data-ad-client='ca-pub-1722366924586940' data-ad-slot='6990906116' data-ad-format='auto'></ins></div>");
-          (adsbygoogle = window.adsbygoogle || []).push({});
+                $('#name').focus();
+            });
+            $('#myModal').modal('show');
+
+            //파일 업로드
+            'use strict';
+
+            $('#upLoadFile').fileupload({
+                dataType: 'json',
+                done: function (e, data) {
+                    $.each(data.result.files, function (index, file) {
+                        socket.emit('send image', {"imgUrl":file.name,"name":socket.name, "room" : roomNum});
+                    });
+                },
+                progressall: function (e, data) {
+                    var progress = parseInt(data.loaded / data.total * 100, 10);
+
+                    $('#progress .progress-bar').css(
+                        'width',
+                        progress + '%'
+                    );
+                }
+            }).prop('disabled', !$.support.fileInput)
+            // .parent().addClass($.support.fileInput ? undefined : 'disabled');
+        });
+
+        $('#myModal').modal({
+            backdrop: 'static',
+            keyboard: false,
+            show: false
+        });
+
+        $(function(){
+            $("button#startButton").click(function(){
+                socket.name = $('#name').val();
+                socket.emit('waiting', socket.name);
+                $("#myModal").modal("hide");
+            });
+        });
+
+
+        $(function(){
+            $("button#sendButton").click(function(){
+                self.sendForm();
+            });
+        });
+
+        $(function(){
+            $("button#leaveButton").click(function(){
+                $("#messages").append($('<tr class="danger">').append($('<td class="col-md-1 col-sm-1">').text('알림')).append($('<td class="col-md-8 col-sm-8">').text('퇴장하였습니다.')));
+                socket.emit('leave', roomNum);
+                $("#myModal").modal();
+            });
+        });
+
+        function sendForm() {
+            if ($('#message').val()) {
+                socket.emit('chat message', {"name":socket.name,"msg":$('#message').val(), "room" : roomNum});
+                $('#message').val('');
+            }
         }
 
-        $('#name').focus();
-      });
-      $('#myModal').modal('show');
+        socket.on('chat message', function(msg){
+            $("#messages").append($('<tr>').append($('<td class="col-md-1 col-sm-1">').text(msg.name)).append($('<td class="col-md-8 col-sm-8">').text(msg.msg)));
+            $(window).scrollTop($(document).height());
+        });
 
-      //파일 업로드
-      'use strict';
+        socket.on('send image', function(msg){
+            setTimeout(function(){
+                $("#messages").append($('<tr>').append($('<td class="col-md-1 col-sm-1">').text(msg.name)).append($('<td class="col-md-8 col-sm-8">').append($('<img class="img-responsive" src="https://rgtalk.blob.core.windows.net/' + msg.imgUrl + '">'))));
+                $(window).scrollTop($(document).height());
+            }, 2000);
+        });
 
-      $('#upLoadFile').fileupload({
-        dataType: 'json',
-        done: function (e, data) {
-          $.each(data.result.files, function (index, file) {
-            socket.emit('send image', {"imgUrl":file.name,"name":socket.name, "room" : roomNum});
-          });
-        },
-        progressall: function (e, data) {
-          var progress = parseInt(data.loaded / data.total * 100, 10);
+        socket.on('info', function(msg){
+            $("#total-info").text(msg.total);
+            $("#users-info").text(msg.users);
+            $("#rooms-info").text(msg.rooms);
+        });
 
-          $('#progress .progress-bar').css(
-            'width',
-            progress + '%'
-          );
-        }
-      }).prop('disabled', !$.support.fileInput)
-      // .parent().addClass($.support.fileInput ? undefined : 'disabled');
-    });
+        socket.on('join', function(res){
+            roomNum = res.room;
+            $("#messages").append($('<tr class="success">').append($('<td class="col-md-1 col-sm-1">').text('알림')).append($('<td class="col-md-8 col-sm-8">').text(res.name + '님이 입장하였습니다.')));
+            socket.emit('join', res);
+        });
 
-    $('#myModal').modal({
-      backdrop: 'static',
-      keyboard: false,
-      show: false
-    });
+        socket.on('destory room', function(room) {
+            $("#messages").append($('<tr class="warning">').append($('<td class="col-md-1 col-sm-1">').text('알림')).append($('<td class="col-md-8 col-sm-8">').text('상대방이 나갔습니다.')));
+            socket.emit('waiting', socket.name);
+        });
 
-    $(function(){
-      $("button#startButton").click(function(){
-        socket.name = $('#name').val();
-        socket.emit('waiting', socket.name);
-        $("#myModal").modal("hide");
-      });
-    });
+        socket.on('test', function(obj){
+        });
+
+        </script>
 
 
-    $(function(){
-      $("button#sendButton").click(function(){
-        self.sendForm();
-      });
-    });
-
-    $(function(){
-      $("button#leaveButton").click(function(){
-        $("#messages").append($('<tr class="danger">').append($('<td class="col-md-1 col-sm-1">').text('알림')).append($('<td class="col-md-8 col-sm-8">').text('퇴장하였습니다.')));
-        socket.emit('leave', roomNum);
-        $("#myModal").modal();
-      });
-    });
-
-    function sendForm() {
-      if ($('#message').val()) {
-        socket.emit('chat message', {"name":socket.name,"msg":$('#message').val(), "room" : roomNum});
-        $('#message').val('');
-      }
-    }
-
-    socket.on('chat message', function(msg){
-      $("#messages").append($('<tr>').append($('<td class="col-md-1 col-sm-1">').text(msg.name)).append($('<td class="col-md-8 col-sm-8">').text(msg.msg)));
-      $(window).scrollTop($(document).height());
-    });
-
-    socket.on('send image', function(msg){
-      setTimeout(function(){
-        $("#messages").append($('<tr>').append($('<td class="col-md-1 col-sm-1">').text(msg.name)).append($('<td class="col-md-8 col-sm-8">').append($('<img class="img-responsive" src="https://rgtalk.blob.core.windows.net/' + msg.imgUrl + '">'))));
-        $(window).scrollTop($(document).height());
-      }, 2000);
-    });
-
-    socket.on('info', function(msg){
-      $("#total-info").text(msg.total);
-      $("#users-info").text(msg.users);
-      $("#rooms-info").text(msg.rooms);
-    });
-
-    socket.on('join', function(res){
-      roomNum = res.room;
-      $("#messages").append($('<tr class="success">').append($('<td class="col-md-1 col-sm-1">').text('알림')).append($('<td class="col-md-8 col-sm-8">').text(res.name + '님이 입장하였습니다.')));
-      socket.emit('join', res);
-    });
-
-    socket.on('destory room', function(room) {
-      $("#messages").append($('<tr class="warning">').append($('<td class="col-md-1 col-sm-1">').text('알림')).append($('<td class="col-md-8 col-sm-8">').text('상대방이 나갔습니다.')));
-      socket.emit('waiting', socket.name);
-    });
-
-    socket.on('test', function(obj){
-    });
-
-    </script>
-
-
-  </body>
-  </html>
+    </body>
+    </html>
