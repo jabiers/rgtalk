@@ -63,8 +63,6 @@ app.delete('/upload', function( req, res ){
 
 
 app.post('/upload', function(req, res, next){
-
-	console.log('/upload');
 	var blobSvc = azure.createBlobService();
 	//create write stream for blob
 
@@ -78,13 +76,13 @@ app.post('/upload', function(req, res, next){
 	day = (day < 10 ? "0" : "") + day;
 
 	var containername = year + '-' + month + '-' + day;
-	console.log(containername);
 	blobSvc.createContainerIfNotExists(containername, {publicAccessLevel : 'blob'}, function (error, result, response) {
 
 		if (!error) {
 			// Container exists and allows
 			// anonymous read access to blob
 			// content and metadata within this container
+
 
 			var busboy = new Busboy({ headers: req.headers });
 			var newname;
@@ -100,7 +98,6 @@ app.post('/upload', function(req, res, next){
 				});
 
 				busboy.on('finish', function () {
-					console.log('finish');
 					// res.redirect(redirect.replace(/%s/, encodeURIComponent(JSON.stringify(files))));
 					res.set({
 						'Content-Type': (req.headers.accept || '').indexOf('application/json') !== -1
@@ -117,7 +114,6 @@ app.post('/upload', function(req, res, next){
 
 				req.on('error', function (error) {
 					//KO - handle piping errors
-					console.log('error: ' + error);
 				});
 				req.once('end', function () {
 					//OK
