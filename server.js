@@ -11,38 +11,26 @@ var crypto = require('crypto');
 var path = require('path');
 var azure = require('azure-storage');
 var uuid = require('node-uuid');
-var entityGen = azure.TableUtilities.entityGenerator;
-var nconf = require('nconf');
-var multiparty = require('multiparty');
 var Busboy = require('busboy');
-
-// nconf.env().file({ file: 'config.json', search: true });
-// var tableName = nconf.get("TABLE_NAME");
-// var partitionKey = nconf.get("PARTITION_KEY");
-// var accountName = nconf.get("STORAGE_NAME");
-// var accountKey = nconf.get("STORAGE_KEY");
-// var accessKey = nconf.get("ACCESS_KEY");
-// var connectingString = nconf.get("CONNECTING_STRING");
-
 
 var waiting = [];
 var connectionCount = 0;
 var message = {};
-//
-// upload.configure({
-// 	uploadDir: __dirname + '/public/uploads',
-// 	uploadUrl: '/uploads',
-// 	imageVersions: {
-// 		thumbnail: {
-// 			width: 80,
-// 			height: 80
-// 		}
-// 	}
-// });
-//
-// upload.on("begin", function(fileInfo) {
-// 	fileInfo.name = crypto.createHash('md5').update(fileInfo.originalName).digest('hex') + path.extname(fileInfo.originalName);
-// });
+
+var tableService = azure.createTableService();
+tableService.createTableIfNotExists('RoomInfo', function(error) {
+	if(!error) {
+		var entGen = azure.TableUtilities.entityGenerator;
+		var task = {
+		  PartitionKey: entGen.String("aaa"),
+		  RowKey: entGen.String('1'),
+		  startDate: entGen.DateTime(new Date())
+		};
+
+		// tableService.insertOrReplaceEntity();
+	}
+});
+
 
 app.use(ua.middleware("UA-72646153-1", {cookieName: '_ga'}));
 app.use(express.static('public'));
@@ -121,15 +109,6 @@ app.post('/upload', function(req, res, next){
 			}
 
 		});
-		//
-		// upload.fileHandler({
-		// 	uploadDir: function () {
-		// 		return __dirname + '/public/uploads/'
-		// 	},
-		// 	uploadUrl: function () {
-		// 		return '/uploads'
-		// 	}
-		// })(req, res, next);
 	});
 
 	app.get('/', function (req,res) {
@@ -220,11 +199,14 @@ app.post('/upload', function(req, res, next){
 		}
 
 		function emitJoin(soc1, soc2) {
-			soc1.emit('join', {"room":"random:" + soc1.id + soc2.id, "name":soc2.name});
-			soc2.emit('join', {"room":"random:" + soc1.id + soc2.id, "name":soc1.name});
+			var roomName = "random:" + soc1.id + soc2.id;
+			soc1.emit('join', {"room":roomName, "name":soc2.name});
+			soc2.emit('join', {"room":roomName, "name":soc1.name});
+
 		}
 		message['waiting'] = waiting.length;
 		message['rooms'] = io.sockets.adapter.rooms;
+		message['uuid'] = uuid.v1();
 		io.sockets.emit("test", message);
 	}, 1000);
 
