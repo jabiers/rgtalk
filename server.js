@@ -18,16 +18,10 @@ var connectionCount = 0;
 var message = {};
 
 var tableService = azure.createTableService();
+var isOpenedTableService = false;
 tableService.createTableIfNotExists('RoomInfo', function(error) {
 	if(!error) {
-		var entGen = azure.TableUtilities.entityGenerator;
-		var task = {
-		  PartitionKey: entGen.String("aaa"),
-		  RowKey: entGen.String('1'),
-		  startDate: entGen.DateTime(new Date())
-		};
-
-		// tableService.insertOrReplaceEntity();
+		isOpenedTableService = true;
 	}
 });
 
@@ -203,30 +197,54 @@ app.post('/upload', function(req, res, next){
 			soc1.emit('join', {"room":roomName, "name":soc2.name});
 			soc2.emit('join', {"room":roomName, "name":soc1.name});
 
-		}
-		message['waiting'] = waiting.length;
-		message['rooms'] = io.sockets.adapter.rooms;
-		message['uuid'] = uuid.v1();
-		io.sockets.emit("test", message);
-	}, 1000);
+			var entGen = azure.TableUtilities.entityGenerator;
+			var roomInfo = {
+				PartitionKey: entGen.String(roomName),
+				RowKey: entGen.String('1'),
+				stringValue: entGen.String("string")
+				// startDate: entGen.DateTime(new Date())
+			};
 
-	//정보 갱신
-	setInterval(function(){
-		var rooms = io.sockets.adapter.rooms;
-		var roomCount = 0;
-		for (var roomName in rooms) {
-			if (stringStartsWith(roomName, "random")) {
-				roomCount++;
+			console.log(roomInfo);
+
+			tableService.insertOrReplaceEntity('RoomInfo', roomInfo, function(error, result, response) {
+				console.log(error);
+				console.log(response);
+				var query = new azure.TableQuery()
+				.top(5);
+
+				tableService.queryEntities('RoomInfo', query, null, function(error, result, response) {
+					if (!error) {
+						console.log(result);
+						// result.entries contains entities matching the query
+					}
+				});
+				console.log("insert Or Replace")});
+
 			}
+			message['waiting'] = waiting.length;
+			message['rooms'] = io.sockets.adapter.rooms;
+			message['uuid'] = uuid.v1();
+			io.sockets.emit("test", message);
+		}, 1000);
+
+		//정보 갱신
+		setInterval(function(){
+			var rooms = io.sockets.adapter.rooms;
+			var roomCount = 0;
+			for (var roomName in rooms) {
+				if (stringStartsWith(roomName, "random")) {
+					roomCount++;
+				}
+			}
+			io.sockets.emit("info", {"waitingUser":waiting.length, "users":connectionCount, "total":100, "rooms":roomCount});
+
+		}, 10000);
+
+		function stringStartsWith (string, prefix) {
+			return string.slice(0, prefix.length) == prefix;
 		}
-		io.sockets.emit("info", {"waitingUser":waiting.length, "users":connectionCount, "total":100, "rooms":roomCount});
 
-	}, 10000);
-
-	function stringStartsWith (string, prefix) {
-		return string.slice(0, prefix.length) == prefix;
-	}
-
-	http.listen(process.env.PORT || 8080, function() {
-		console.log('listening on *:');
-	});
+		http.listen(process.env.PORT || 8080, function() {
+			console.log('listening on *:');
+		});
